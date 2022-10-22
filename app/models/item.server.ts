@@ -17,3 +17,7 @@ export const toggleCompleted = (data: Pick<Item, 'id' | 'completed'>) => {
 export const deleteItem = (id: Item['id']) => {
     return prisma.item.delete({ where: { id } })
 }
+
+export const getItem = (id: Item['id']) => {
+    return prisma.item.findUnique({where: {id}, include: {List: true}})
+}

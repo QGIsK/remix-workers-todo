@@ -9,9 +9,9 @@ import { FaCheck, FaTimes, FaTrash } from 'react-icons/fa'
 
 import { Form, useFetcher, useLoaderData } from "@remix-run/react";
 import { requireUser } from "~/session.server";
-import type { Item, List } from "@prisma/client";
+import type { Item, List, User } from "@prisma/client";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { createItem, toggleCompleted, deleteItem } from "~/models/item.server";
+import { createItem, toggleCompleted, deleteItem, getItem } from "~/models/item.server";
 import Card from "~/components/Card";
 
 type ActionData =
@@ -45,11 +45,9 @@ export const AddItemAction = async (formData: FormData) => {
   return json({ ok: true });
 }
 
-const ToggleCompletedAction = async (formData: FormData) => {
+const ToggleCompletedAction = async (formData: FormData, user: User) => {
   const itemId = formData.get('itemId')
   const completed = formData.get('completed') === 'true'
-
-  console.log(completed)
 
   const errors = {
     itemId: itemId ? null : "itemId is required",
@@ -63,16 +61,18 @@ const ToggleCompletedAction = async (formData: FormData) => {
     return json<ActionData>({ errors });
   }
 
-
   invariant(typeof itemId === 'string', 'Name isn\'t a string')
   invariant(typeof completed === 'boolean', 'completed isn\'t a boolean')
+
+  const item = await getItem(itemId);
+  invariant(item?.List.userId === user.id, "Not found")
 
   await toggleCompleted({ id: itemId, completed })
 
   return json({ ok: true })
 }
 
-export const deleteItemAction = async (formData: FormData) => {
+export const deleteItemAction = async (formData: FormData, user: User) => {
   const itemId = formData.get('itemId')
   const errors = {
     itemId: itemId ? null : "itemId is required",
@@ -87,6 +87,9 @@ export const deleteItemAction = async (formData: FormData) => {
   }
 
   invariant(typeof itemId === 'string', 'Name isn\'t a string')
+
+  const item = await getItem(itemId);
+  invariant(item?.List.userId === user.id, "Not found")
 
   await deleteItem(itemId)
 
@@ -94,15 +97,18 @@ export const deleteItemAction = async (formData: FormData) => {
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData();
+  const [user, formData] = await Promise.all([
+    requireUser(request),
+    request.formData()
+  ])
 
   switch (formData.get('action')) {
     case "addItem":
       return AddItemAction(formData)
     case "toggleComplete":
-      return ToggleCompletedAction(formData);
+      return ToggleCompletedAction(formData, user);
     case "deleteItem":
-      return deleteItemAction(formData)
+      return deleteItemAction(formData, user)
     default:
       return json({ message: 'unsupported action' })
   }
@@ -110,9 +116,10 @@ export const action: ActionFunction = async ({ request }) => {
 
 export const loader = async ({ request, params }: LoaderArgs) => {
   invariant(params.listId);
-  const user = await requireUser(request);
-
-  const list = await getListById(params.listId);
+  const [user, list] = await Promise.all([
+    requireUser(request),
+    getListById(params.listId)
+  ])
 
   invariant(list, "List not found");
   if (user.id !== list.userId) return redirect("/lists");

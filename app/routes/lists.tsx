@@ -6,7 +6,7 @@ import { json } from "@remix-run/server-runtime";
 import { useEffect, useMemo, useRef } from "react";
 import { FaTrash } from "react-icons/fa";
 import invariant from "tiny-invariant";
-import { getUserLists, deleteList, createList } from "~/models/list.server";
+import { getUserLists, deleteList, createList, getListById } from "~/models/list.server";
 import { requireUser } from "~/session.server";
 
 
@@ -16,7 +16,7 @@ type ActionData =
   }
   | undefined;
 
-const deleteAction = async (formData: FormData) => {
+const deleteAction = async (formData: FormData, user: User) => {
   const listId = formData.get('listId')
 
   const errors = {
@@ -33,7 +33,8 @@ const deleteAction = async (formData: FormData) => {
 
   invariant(typeof listId === 'string', 'listId isn\'t a string')
 
-  console.log(listId)
+  const list = await getListById(listId)
+  invariant(list?.userId === user.id, "Not found")
 
   await deleteList(listId)
 
@@ -62,32 +63,29 @@ const createAction = async (formData: FormData) => {
 
   await createList({ name, userId })
 
-  return json({ok: true})
+  return json({ ok: true })
 }
 
 export const action: ActionFunction = async ({ request }) => {
-  const formData = await request.formData()
+  const [user, formData] = await Promise.all([
+    requireUser(request),
+    request.formData()
+  ])
 
-  const actionType = formData.get('action')
-
-
-  switch (actionType) {
+  switch (formData.get("action")) {
     case "create":
       return createAction(formData)
     case "delete":
-      return deleteAction(formData)
+      return deleteAction(formData, user)
     default:
       return json({ message: "Unsupported action" })
   }
-
 }
-
 
 type LoaderData = {
   lists: List[];
   user: User;
 };
-
 
 export const loader: LoaderFunction = async ({ request }) => {
   const user = await requireUser(request);
