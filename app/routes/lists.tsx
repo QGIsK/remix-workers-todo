@@ -3,7 +3,7 @@ import { Outlet, useLoaderData, Link, Form, useFetcher } from "@remix-run/react"
 import type { ActionFunction, LoaderFunction } from "@remix-run/server-runtime";
 import { redirect } from "@remix-run/server-runtime";
 import { json } from "@remix-run/server-runtime";
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef } from "react";
 import { FaTrash } from "react-icons/fa";
 import invariant from "tiny-invariant";
 import { getUserLists, deleteList, createList, getListById } from "~/models/list.server";
@@ -153,7 +153,6 @@ const Sidebar = (props: { user: User; lists: List[] }) => {
             Logout
           </button>
         </Form>
-
       </div>
     </div>
   );

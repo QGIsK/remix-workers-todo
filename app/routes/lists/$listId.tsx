@@ -34,7 +34,7 @@ export const AddItemAction = async (formData: FormData) => {
   );
 
   if (hasErrors) {
-    return json<ActionData>({ errors });
+    return json<ActionData>({ errors }, { status: 422 });
   }
 
   invariant(typeof name === 'string', 'Name isn\'t a string')
@@ -42,7 +42,7 @@ export const AddItemAction = async (formData: FormData) => {
 
   await createItem({ name, listId })
 
-  return json({ ok: true });
+  return json({ ok: true }, {status: 202});
 }
 
 const ToggleCompletedAction = async (formData: FormData, user: User) => {
@@ -58,7 +58,7 @@ const ToggleCompletedAction = async (formData: FormData, user: User) => {
   );
 
   if (hasErrors) {
-    return json<ActionData>({ errors });
+    return json<ActionData>({ errors }, { status: 422 });
   }
 
   invariant(typeof itemId === 'string', 'Name isn\'t a string')
@@ -69,7 +69,7 @@ const ToggleCompletedAction = async (formData: FormData, user: User) => {
 
   await toggleCompleted({ id: itemId, completed })
 
-  return json({ ok: true })
+  return json({ ok: true }, { status: 202 })
 }
 
 export const deleteItemAction = async (formData: FormData, user: User) => {
@@ -83,7 +83,7 @@ export const deleteItemAction = async (formData: FormData, user: User) => {
   );
 
   if (hasErrors) {
-    return json<ActionData>({ errors });
+    return json<ActionData>({ errors }, {status: 422});
   }
 
   invariant(typeof itemId === 'string', 'Name isn\'t a string')
@@ -93,7 +93,7 @@ export const deleteItemAction = async (formData: FormData, user: User) => {
 
   await deleteItem(itemId)
 
-  return json({ ok: true })
+  return json({ ok: true }, { status: 202 })
 }
 
 export const action: ActionFunction = async ({ request }) => {
@@ -110,7 +110,7 @@ export const action: ActionFunction = async ({ request }) => {
     case "deleteItem":
       return deleteItemAction(formData, user)
     default:
-      return json({ message: 'unsupported action' })
+      return json({ message: 'unsupported action' }, {status: 405})
   }
 }
 
