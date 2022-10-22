@@ -30,9 +30,11 @@
     "@remix-run/serve": "^1.7.3",
     "@remix-run/server-runtime": "^1.7.3",
     "bcryptjs": "^2.4.3",
+    "classnames": "^2.3.2",
     "isbot": "^3.5.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-icons": "^4.6.0",
     "tiny-invariant": "^1.2.0"
   },
   "devDependencies": {

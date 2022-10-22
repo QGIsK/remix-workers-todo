@@ -1,0 +1,9 @@
+  {
+    "recommendations": [
+      "voorjaar.windicss-intellisense",
+      "zixuanchen.vitest-explorer",
+      "dbaeumer.vscode-eslint",
+      // git extension
+      "eamodio.gitlens",
+    ]
+  }

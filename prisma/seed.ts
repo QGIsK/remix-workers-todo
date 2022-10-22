@@ -10,7 +10,7 @@ async function seed() {
     //void
   });
 
-  const hashedPassword = await bcrypt.hash("10script10", 10);
+  const hashedPassword = await bcrypt.hash("testing123", 10);
 
   const user = await prisma.user.create({
     data: {
@@ -41,10 +41,8 @@ async function seed() {
   await prisma.item.create({
     data: {
       name: "My first item",
-      content: "Make todo list",
 
       listId: primaryList.id,
-      userId: user.id
     }
   })
 
@@ -52,10 +50,8 @@ async function seed() {
   await prisma.item.create({
     data: {
       name: "My second item",
-      content: "Secondary item",
 
       listId: secondaryList.id,
-      userId: user.id
     }
   })
 

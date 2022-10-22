@@ -15,7 +15,6 @@ model User {
   updatedAt DateTime @updatedAt
 
   password Password?
-  Item     Item[]
   List     List[]
 }
 
@@ -44,14 +43,10 @@ model Item {
   id String @id @default(cuid())
 
   name    String
-  content String
 
   completed Boolean @default(false)
 
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade, onUpdate: Cascade)
-  userId String
-
-  List   List   @relation(fields: [listId], references: [id])
+  List   List   @relation(fields: [listId], references: [id], onDelete: Cascade, onUpdate: Cascade)
   listId String
 
   createdAt DateTime @default(now())

@@ -1,0 +1,24 @@
+{
+  "editor.formatOnSave": false,
+  "prettier.enable": false,
+  "editor.tabSize": 4,
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  // ESLint settings
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": true,
+  },
+  "eslint.run": "onType",
+  "eslint.workingDirectories": [
+    "./client/src"
+  ],
+  "eslint.nodePath": "./node_modules",
+  "typescript.tsdk": "node_modules\\typescript\\lib",
+  // Git settings
+  "git.branchProtection": [
+    "master",
+    "development"
+  ],
+  "git.branchWhitespaceChar": "-",
+  "git.requireGitUserConfig": true
+}
